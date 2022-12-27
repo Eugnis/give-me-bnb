@@ -38,19 +38,19 @@ $ give-me-bnb -key <key>
 ### Docker
 
 ```sh
-$ docker run --rm kewka/give-me-bnb give-me-bnb -key <key>
+$ docker run --rm kewka/give-me-bnb give-me-bnb -key <key> -anticaptchaKey <anticaptchaKey>
 ```
 
 ### Docker (Tor proxy)
 
 ```sh
-$ docker run --rm kewka/give-me-bnb give-me-bnb -proxy socks5://127.0.0.1:9050 -key <key>
+$ docker run --rm kewka/give-me-bnb give-me-bnb -proxy socks5://127.0.0.1:9050 -key <key> -anticaptchaKey <anticaptchaKey>
 ```
 
 ### Docker (Tor proxy + infinite loop)
 
 ```sh
-$ docker run --rm kewka/give-me-bnb sh -c "while :; do give-me-bnb -proxy socks5://127.0.0.1:9050 -key <key>; killall -HUP tor; done"
+$ docker run --rm kewka/give-me-bnb sh -c "while :; do give-me-bnb -proxy socks5://127.0.0.1:9050 -key <key> -anticaptchaKey <anticaptchaKey>; killall -HUP tor; done"
 ```
 
 ## Credits

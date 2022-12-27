@@ -14,6 +14,7 @@ require (
 
 require (
 	github.com/StackExchange/wmi v1.2.1 // indirect
+	github.com/aidenesco/anticaptcha v0.0.0-20210814211113-9d1accd97aea // indirect
 	github.com/btcsuite/btcd v0.20.1-beta // indirect
 	github.com/deckarep/golang-set v0.0.0-20180603214616-504e848d77ea // indirect
 	github.com/go-ole/go-ole v1.2.5 // indirect

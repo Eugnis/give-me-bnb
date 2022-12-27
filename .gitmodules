@@ -1,3 +1,0 @@
-[submodule "third_party/hcaptcha-challenger"]
-	path = third_party/hcaptcha-challenger
-	url = https://github.com/kewka/hcaptcha-challenger

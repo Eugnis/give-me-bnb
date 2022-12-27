@@ -14,10 +14,11 @@ import (
 )
 
 var (
-	proxy    string
-	rpcUrl   string
-	account  *blockchain.Account
-	currency faucet.Currency
+	proxy          string
+	rpcUrl         string
+	anticaptchaKey string
+	account        *blockchain.Account
+	currency       faucet.Currency
 )
 
 func main() {
@@ -30,6 +31,7 @@ func main() {
 func parseArgs() error {
 	keyArg := flag.String("key", "", "your private key (required)")
 	flag.StringVar(&proxy, "proxy", "", "proxy url")
+	flag.StringVar(&anticaptchaKey, "anticaptchaKey", "", "anticaptchaKey")
 	flag.StringVar(&rpcUrl, "rpc", "https://data-seed-prebsc-1-s1.binance.org:8545", "bsc testnet rpc url")
 	currencyArg := flag.String("currency", faucet.BNB.Symbol(), "faucet currency")
 	flag.Parse()
@@ -70,7 +72,7 @@ func run() error {
 	}
 	defer client.Close()
 
-	captchaRes, err := captcha.New(baseCtx)
+	captchaRes, err := captcha.New(baseCtx, anticaptchaKey)
 	if err != nil {
 		return fmt.Errorf("captcha.New: %w", err)
 	}

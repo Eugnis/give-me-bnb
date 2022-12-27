@@ -1,20 +1,14 @@
 package captcha
 
 import (
-	"bufio"
-	"bytes"
 	"context"
 	_ "embed"
-	"errors"
 	"fmt"
 	"net"
 	"net/http"
-	"os"
-	"os/exec"
-	"path"
-	"strings"
 	"time"
 
+	"github.com/aidenesco/anticaptcha"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -23,13 +17,11 @@ var (
 	captchaHtml []byte
 )
 
-func New(ctx context.Context) (string, error) {
+func New(ctx context.Context, anticaptchaKey string) (string, error) {
 	l, err := net.Listen("tcp", ":0")
 	if err != nil {
 		return "", err
 	}
-
-	captchaUrl := fmt.Sprintf("http://127.0.0.1:%v", l.Addr().(*net.TCPAddr).Port)
 
 	g, ctx := errgroup.WithContext(ctx)
 
@@ -44,7 +36,7 @@ func New(ctx context.Context) (string, error) {
 	g.Go(func() error {
 		defer serverCancel()
 		var err error
-		ret, err = execute(ctx, captchaUrl)
+		ret, err = execute(ctx, anticaptchaKey)
 		return err
 	})
 
@@ -79,22 +71,15 @@ func serve(ctx context.Context, l net.Listener) error {
 	return g.Wait()
 }
 
-func execute(ctx context.Context, captchaUrl string) (string, error) {
-	wd, err := os.Getwd()
-	if err != nil {
-		return "", err
-	}
+func execute(ctx context.Context, anticaptchaKey string) (string, error) {
+	client := anticaptcha.NewClient(anticaptchaKey)
+	balance, _ := client.GetBalance(context.Background())
 
-	output, err := exec.CommandContext(ctx, "python3", path.Join(wd, "third_party", "hcaptcha-challenger", "src", "main.py"), "demo", captchaUrl, "--silence").Output()
+	fmt.Println("Anticaptcha balance left:", balance)
+	res, err := client.HCaptchaProxyless(ctx, "https://testnet.bnbchain.org/faucet-smart", "d9a9ee67-74da-4601-9f31-efe6a297a5cc")
+
 	if err != nil {
 		return "", err
 	}
-	scanner := bufio.NewScanner(bytes.NewReader(output))
-	for scanner.Scan() {
-		line := scanner.Text()
-		if strings.HasPrefix(line, "CAPTCHA_RESPONSE: ") {
-			return line[len("CAPTCHA_RESPONSE: "):], nil
-		}
-	}
-	return "", errors.New("CAPTCHA_RESPONSE not found")
+	return res.GRecaptchaResponse, nil
 }
